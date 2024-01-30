@@ -126,7 +126,6 @@ MyString& MyString::insert(int index, const MyString& str) {
 MyString& MyString::insert(int index, const char* str) {
 	// str의 길이 얻기
 	int str_length = strlen(str);
-	printf("함수외부 : [%p]\n", string);
 	// length + str의 length가 memorycapacity를 넘는지 확인 
 	if (length + str_length > memory_capacity) {
 		// 재할당
@@ -152,7 +151,6 @@ void MyString::assignFunC(int str_length, char* string) { // *& 레퍼런스를 변수�
 	memory_capacity = length + str_length;
 	char* prevString = string;
 	string = new char[memory_capacity + 1];
-	printf("함수내부 : [%p]\n", string);
 	for (int i = 0; i < length; i++) {
 		string[i] = prevString[i];
 	}
