@@ -11,11 +11,17 @@ public:
 	MyString(const char* str);
 	MyString(const MyString& str);
 	~MyString();
+
 	int length() const;
 	int capacity() const;
-	void reserve(int size);
+	int find(int loc, const MyString& str);
+	int find(int loc, const char* str);
+	int find(int loc, char c);
+	int compare(const MyString& str) const;
 
 	char at(int i) const;
+
+	void reserve(int size);
 
 	void print() const;
 	void println() const;
@@ -26,6 +32,8 @@ public:
 	MyString& insert(int loc, const MyString& str); 
 	MyString& insert(int loc, const char* str);
 	MyString& insert(int loc, char c);
+
+	MyString& erase(int loc, int num);
 };
 
 MyString::MyString(char c) {
@@ -71,6 +79,50 @@ int MyString::length() const {
 
 int MyString::capacity() const {
 	return memory_capacity;
+}
+
+int MyString::find(int loc, const MyString& str) {
+	// 찾을 때 index loc부터 찾는다, 내 객체의 string에 str의 string이 존재하는지 찾기 리턴은 그 단어를 포함한 char중 가장 앞
+	// 가장 앞이 같다면 str의 길이만큼 가져와서 ++하면서 아예 같으면 리턴 i
+	int i, j; // 리턴할 변수
+	for ( i = loc; i <= string_length - str.string_length; i++) {
+		for ( j = 0; j < str.string_length; j++) {
+			if (string_content[i + j] != str.string_content[j]) break;
+		}
+		if (j == str.string_length) return i;
+	}
+	return -1;
+}
+int MyString::find(int loc, const char* str) {
+	MyString temp(str);
+	return find(loc, temp);
+}
+int MyString::find(int loc, char c) {
+	MyString temp(c);
+	return find(loc, temp);
+}
+
+int MyString::compare(const MyString& str) const {
+	// 현재 객체의 string과 str의 string 비교
+	// 사전적으로 더 늦게오면 1, 빠르게 오면 -1 반환, 0은 같은 문자열
+	// 같은 문자열인데, 이 객체의 길이가 더 길다면 -1
+	for (int i = 0; i < std::min(string_length, str.string_length); i++) {
+		if (string_content[i] > str.string_content[i]) {
+			return 1;
+		}
+		else if (string_content[i] < str.string_content[i]) {
+			return -1;
+		}
+	}
+	if (string_length == str.string_length) {
+		return 0;
+	}
+	else if (string_length > str.string_length) {
+		return 1;
+	}
+	
+	
+	return -1;
 }
 
 void MyString::reserve(int size) {
@@ -132,21 +184,47 @@ MyString& MyString::insert(int loc, const MyString& str) {
 		for (int j = 0; j < str.string_length; j++) {
 			string_content[i + j] = str.string_content[j];
 		}
-		for (; i < string_length; i++) {
+		for (i; i < string_length; i++) {
 			string_content[i + str.string_length] = prevContent[i];
 		}
 		delete[] prevContent;
 		string_length += str.string_length;
 		return *this;
 	} 
+	// 재할당이 필요없으니, loc 부분만 뒤로 미루고 insert할 부분 채워주기
+	for (int i = string_length - 1; i >= loc; i--) {
+		string_content[i + str.string_length] = string_content[i];
+	}
+	for (int j = 0; j < str.string_length; j++) {
+		string_content[loc + j] = str.string_content[j];
+	}
+	string_length += str.string_length;
 	return *this;
 }
 MyString& MyString::insert(int loc, const char* str) {
-
-	return *this;
+	MyString temp(str);
+	return insert(loc, temp);
 }
-MyString& MyString::insert(int loc, char c) {
 
+MyString& MyString::insert(int loc, char c) {
+	MyString temp(c);
+	return insert(loc, temp);
+}
+
+MyString& MyString::erase(int loc, int num) {
+	// 지우는 함수 loc부터 num개 삭제
+	// loc부분부터 지운 후 남은 수만큼 땡겨오면 된다. 뒷부분은 어차피 print에서 안나옴
+	// 만약 num의 크기가 너무 크다면 loc부터 다 지워버리면 된다.
+
+	if (loc + num > string_length) {
+		string_length = loc;
+		return *this;
+	}
+	int i;
+	for (i = loc + num; i < string_length; i++) {
+		string_content[i - num] = string_content[i];
+	}
+	string_length -= num;
 	return *this;
 }
 
@@ -168,9 +246,9 @@ void MyString::println() const{
 }
 
 int main() {
-	MyString str1("abcdefghijklnm");
-	str1.println();
-	str1.assign("dragon");
-	str1.println();
+	MyString str1("abcdef");
+	MyString str2("abcde");
+	std::cout << "str1 and str2 compare : " << str1.compare(str2) << std::endl;
+	
 	return 0;
 }
