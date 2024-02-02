@@ -16,10 +16,18 @@ public:
 	Complex& operator-=(const Complex& c);
 	Complex& operator*=(const Complex& c);
 	Complex& operator/=(const Complex& c);
+
+	friend std::ostream& operator<<(std::ostream& os, const Complex& c);
+
 	void println() {
 		std::cout << "( " << real << " , " << img << " ) " << std::endl;
 	}
 };
+
+std::ostream& operator<<(std::ostream& os, const Complex& c) {
+	os << "( " << c.real << " , " << c.img << " ) 입니다.";
+	return os;
+}
 
 double Complex::get_number(const char* str, int from, int to) {
 	// 초기화부분
@@ -116,5 +124,6 @@ Complex Complex::operator*(const Complex& c) {
  int main() {
 	 Complex a(0, 0);
 	 a = a + "-1.1 + i3.923";
-	 a.println();
+	 std::cout << a << std::endl;
+	 return 0;
  }
