@@ -6,7 +6,7 @@ class Base {
 public:
 	Base() : s("기반") { std::cout << "기반 클래스의 what()" << std::endl; }
 
-	void what() { std::cout << s << std::endl; }
+	virtual void what() { std::cout << s << std::endl; }
 };
 
 class Derived : public Base {
