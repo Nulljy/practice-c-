@@ -4,28 +4,17 @@
 
 int main() {
 	// 파일 읽기 준비
-	std::ifstream in("test.txt", std::ios::binary);
-	std::string s = "";
+	std::ifstream in("test.txt");
+	char buf[100];
 
-	if (in.is_open()) {
-		//위치 지정자를 파일 끝으로 옮긴다.
-		in.seekg(0, std::ios::end);
-
-		// 그 위치를 읽는다.
-		int size = in.tellg();
-
-		// 그 크기의 문자열을 할당
-		s.resize(size);
-
-		// 위치 지정자를 다시 파일 맨 앞으로 옮긴다.
-		in.seekg(0, std::ios::beg);
-
-		// 파일 전체 내용을 읽어서 문자열에 저장
-		in.read(&s[0], size);
-		std::cout << s << std::endl;
+	if (!in.is_open()) {
+		std::cout << "해당 txt가 존재하지 않습니다.\n";
+		return 0;
 	}
-	else {
-		std::cout << "파일을 찾을 수 없습니다.\n";
+	while (in) {
+		in.getline(buf, 100); // '\n'을 마주치면 거기까지 buf에 저장
+		std::cout << buf << std::endl;
 	}
+	
 	return 0;
 }
