@@ -1,21 +1,27 @@
 #include <iostream>
 #include <array>
+#include <algorithm>
 
-template <typename T> // 타입이 아닌 템플릿 인자
-void print_array(const T& arr) {
-	for (int i = 0; i < arr.size(); i++) {
-		std::cout << arr[i] << " ";
+
+
+template <typename T> // before using default constructor
+struct Compare {
+	bool operator()(const T& a, const T& b) const { return a < b; }
+};
+
+template<typename T, typename Comp>
+T Min(T a, T b) {
+	Comp comp;
+	if (comp(a, b)) {
+		return a;
 	}
-	std::cout << std::endl;
+	return b;
 }
 
 int main() {
-	std::array<int, 5> arr = { 1, 2, 3, 4, 5 };
-	std::array<int, 7> arr1 = { 1, 2, 3, 4, 5, 6, 7 };
+	int a = 3, b = 4;
+	char a1 = 'c';
+	char a2 = 'a';
 
-	print_array(arr);
-	print_array(arr1);
-
-
-	return 0;
+	std::cout << "min : " << Min<char, Compare<char>>(a1, a2) << std::endl;
 }
