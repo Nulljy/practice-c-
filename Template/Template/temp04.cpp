@@ -1,24 +1,20 @@
 #include <iostream>
 
-// N 객체 생성
-template<int N>
-struct Int {
-	static const int num = N;
+template<int X, int Y> // 함수로 치면 매개변수 뭐 들어갈건지
+struct GCD { // 함수 이름처럼 생각
+	static const int value = GCD<Y, X% Y>::value; // 재귀함수의 형태
 };
-// 더하기
-template<typename T,typename U>
-struct add {
-	typedef Int<T::num + U::num> result;
+
+template<int X>
+struct GCD<X, 0> { // 재귀 끝 조건
+	static const int value = X; // 재귀 끝나고 리턴값으로 생각하면 될듯
 };
 
 
 int main() {
-	typedef Int<1> one;
-	typedef Int<2> two;
-
-	typedef add<one, two>::result three; // typedef가 없다면 three::num에서 ::num 앞에 쓰지 못한다. 클래스 / 구조체 등이어야한다.
-
-	std::cout << three::num;
+	const int a = 15;
+	const int b = 12; // 12, 3 = 0 따라서 3
+	std::cout << a << "와 " << b << "의 최대 공약수는 " << GCD<a, b>::value;
 
 	return 0;
 }
