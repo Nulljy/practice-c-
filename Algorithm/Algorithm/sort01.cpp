@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 
-// sort 사용, template로 매개인자를 원하는 클래스 넣어주기
+// partial_sort
 template<typename Iter>
 void print(Iter begin, Iter end) {
 	while (begin != end) {
@@ -32,7 +32,8 @@ int main() {
 
 	print(vec.begin(), vec.end());
 	//std::sort(vec.begin(), vec.end(), int_compare()); // sort02.cpp
-	std::sort(vec.begin(), vec.end(), greater_comp<int>()); // sort02.cpp
+	//std::sort(vec.begin(), vec.end(), greater_comp<int>()); // sort02.cpp
+	std::partial_sort(vec.begin(), vec.begin() + 3, vec.end()); // sort03.cpp partial_sort
 
 	print(vec.begin(), vec.end());
 
