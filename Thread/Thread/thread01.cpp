@@ -2,9 +2,11 @@
 #include <thread>
 #include <cstdio>
 #include <vector>
+#include <mutex>
 
 using std::thread;
 using std::vector;
+using std::mutex;
 
 //void func1() {
 //	for (int i = 0; i < 10; i++) {
@@ -22,46 +24,69 @@ using std::vector;
 //	}
 //}
 
-void worker(vector<int>::iterator start, vector<int>::iterator end, int* result) {
-	int sum = 0;
-	for (auto itr = start; itr < end; ++itr) {
-		sum += *itr;
-	}
-	*result = sum;
+//void worker(vector<int>::iterator start, vector<int>::iterator end, int* result) {
+//	int sum = 0;
+//	for (auto itr = start; itr < end; ++itr) {
+//		sum += *itr;
+//	}
+//	*result = sum;
+//
+//	thread::id this_id = std::this_thread::get_id(); // thread의 id를 얻는 방법
+//	printf("스레드 %x에서 %d부터 %d까지 계산한 결과 : %d \n", this_id, *start, *(end - 1), sum);
+//}
 
-	thread::id this_id = std::this_thread::get_id(); // thread의 id를 얻는 방법
-	printf("스레드 %x에서 %d부터 %d까지 계산한 결과 : %d \n", this_id, *start, *(end - 1), sum);
+void worker(int& result, mutex& m) {
+	for (int i = 0; i < 10000; i++) {
+		m.lock();
+		result += 1;
+		m.unlock();
+	}
 }
 
 int main() {
-	vector<int> data(10000); // int vector 초기화
-	for (int i = 0; i < 10000; i++) {
-		data[i] = i;
-	}
+	int counter = 0;
+	mutex m;
 
-	vector<int> partial_sums(4); // int vector 초기화
-
-	vector<thread> workers; // thread vector 선언
+	vector<thread> workers;
 
 	for (int i = 0; i < 4; i++) {
-		// thread를 할때 bind를 생각하면 된다.
-		// worker는 함수이다.
-		workers.push_back(
-			thread(
-				worker, data.begin() + i * 2500, data.begin() + (i + 1) * 2500, &partial_sums[i]
-			) // thread의 생성자는 첫번째 인자가 함수나 함수 객체, 다음 arg...는 그 함수에 들어갈 매개인자가 된다.
-		);
+		workers.push_back(thread(worker, std::ref(counter), std::ref(m)));
 	}
 
 	for (int i = 0; i < 4; i++) {
 		workers[i].join();
 	}
 
-	int total = 0;
-	for (int i = 0; i < 4; i++) {
-		total += partial_sums[i];
-	}
-	std::cout << "전체 합: " << total << std::endl;
+	std::cout << "Counter 최종 값: " << counter << std::endl;
+
+	//vector<int> data(10000); // int vector 초기화
+	//for (int i = 0; i < 10000; i++) {
+	//	data[i] = i;
+	//}
+
+	//vector<int> partial_sums(4); // int vector 초기화
+
+	//vector<thread> workers; // thread vector 선언
+
+	//for (int i = 0; i < 4; i++) {
+	//	// thread를 할때 bind를 생각하면 된다.
+	//	// worker는 함수이다.
+	//	workers.push_back(
+	//		thread(
+	//			worker, data.begin() + i * 2500, data.begin() + (i + 1) * 2500, &partial_sums[i]
+	//		) // thread의 생성자는 첫번째 인자가 함수나 함수 객체, 다음 arg...는 그 함수에 들어갈 매개인자가 된다.
+	//	);
+	//}
+
+	//for (int i = 0; i < 4; i++) {
+	//	workers[i].join();
+	//}
+
+	//int total = 0;
+	//for (int i = 0; i < 4; i++) {
+	//	total += partial_sums[i];
+	//}
+	//std::cout << "전체 합: " << total << std::endl;
 
 	//thread t1(func1);
 	//thread t2(func2);
